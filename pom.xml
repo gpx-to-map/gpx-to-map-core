@@ -59,6 +59,11 @@
             <artifactId>staticmap</artifactId>
             <version>0.0.3</version>
         </dependency>
+        <dependency>
+            <groupId>org.jfree</groupId>
+            <artifactId>org.jfree.svg</artifactId>
+            <version>5.0.7</version>
+        </dependency>
         <!--TESTS -->
         <dependency>
             <groupId>org.assertj</groupId>
