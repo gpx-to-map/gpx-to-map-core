@@ -7,6 +7,8 @@ import map.ElevationGraphCreator;
 import map.StaticMapCreator;
 import map.filewriter.FileWriter;
 import map.filewriter.PngWriter;
+import org.jfree.chart.JFreeChart;
+import org.knowm.xchart.XYChart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,10 +53,10 @@ public class DefaultGpxMapper implements IGpxMapper {
 
         BufferedImage map = StaticMapCreator.createMap(wayPoints, width, height, styler);
         if (styler.displayElevationGraph()) {
-            BufferedImage elevationGraph = ElevationGraphCreator.createElevationGraph(wayPoints, width, chartHeight, styler);
-            this.fileWriter.writeMapImageToFile(gpxFile, outputFolder, styler, map, elevationGraph);
+            JFreeChart elevationGraph = ElevationGraphCreator.getElevationGraph(wayPoints, styler);
+            this.fileWriter.writeMapImageToFile(gpxFile, outputFolder, styler, map, elevationGraph, width, height, chartHeight);
         } else {
-            this.fileWriter.writeMapImageToFile(gpxFile, outputFolder, styler, map);
+            this.fileWriter.writeMapImageToFile(gpxFile, outputFolder, styler, map, width, height);
         }
         return GpxMetadataExtractor.extract(gpxFile.getName(), tracks, wayPoints);
     }

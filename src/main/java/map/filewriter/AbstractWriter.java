@@ -1,47 +1,36 @@
 package map.filewriter;
 
 import map.gpx.GpxStyler;
-import map.gpx.GraphToMapPosition;
+import org.jfree.chart.JFreeChart;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
-public abstract class AbstractWriter implements FileWriter {
+public abstract class AbstractWriter<U> implements FileWriter {
 
     @Override
-    public void writeMapImageToFile(File gpxFile, Path outputFolder, GpxStyler styler, BufferedImage map, BufferedImage elevationGraph) throws IOException {
+    public void writeMapImageToFile(File gpxFile, Path outputFolder, GpxStyler styler, BufferedImage map, JFreeChart elevationGraph, int width, int height, int chartHeight) throws IOException {
         if (styler.separateFiles()) {
-            writeImage(gpxFile, outputFolder, "map", map);
-            writeImage(gpxFile, outputFolder, "elevation", elevationGraph);
+            writeImage(gpxFile, outputFolder, "map", map, width, height);
+            writeChart(gpxFile, outputFolder, "elevation", elevationGraph, styler, width, chartHeight);
         } else {
-            BufferedImage resultingImage = combineGraphAndMap(styler, map, elevationGraph);
-            writeImage(gpxFile, outputFolder, null, resultingImage);
+            U resultingImage = combineGraphAndMap(styler, map, elevationGraph, chartHeight);
+            writeImage(gpxFile, outputFolder, null, resultingImage, width, height);
         }
     }
 
     @Override
-    public void writeMapImageToFile(File gpxFile, Path outputFolder, GpxStyler styler, BufferedImage map) throws IOException {
-        writeImage(gpxFile, outputFolder, null, map);
+    public void writeMapImageToFile(File gpxFile, Path outputFolder, GpxStyler styler, BufferedImage map, int width, int height) throws IOException {
+        writeImage(gpxFile, outputFolder, null, map, width, height);
     }
 
-    protected abstract void writeImage(File gpxFile, Path outputFolder, String suffix, BufferedImage map) throws IOException;
+    protected abstract void writeImage(File gpxFile, Path outputFolder, String suffix, U map, int width, int height) throws IOException;
 
-    protected BufferedImage combineGraphAndMap(GpxStyler styler, BufferedImage map, BufferedImage elevationGraph) {
-        BufferedImage combinedImages = new BufferedImage(map.getWidth(),
-                map.getHeight() + elevationGraph.getHeight(),
-                BufferedImage.TYPE_INT_RGB);
-        Graphics graphics = combinedImages.getGraphics();
-        if (GraphToMapPosition.BOTTOM == styler.graphPosition()) {
-            graphics.drawImage(map, 0, 0, null);
-            graphics.drawImage(elevationGraph, 0, map.getHeight(), null);
-        } else {
-            graphics.drawImage(map, 0, elevationGraph.getHeight(), null);
-            graphics.drawImage(elevationGraph, 0, 0, null);
-        }
-        graphics.dispose();
-        return combinedImages;
-    }
+    protected abstract void writeImage(File gpxFile, Path outputFolder, String suffix, BufferedImage map, int width, int height) throws IOException;
+
+    protected abstract void writeChart(File gpxFile, Path outputFolder, String suffix, JFreeChart elevationGraph, GpxStyler styler, int width, int height) throws IOException;
+
+    protected abstract U combineGraphAndMap(GpxStyler styler, BufferedImage map, JFreeChart elevationGraph, int chartHeight);
 }

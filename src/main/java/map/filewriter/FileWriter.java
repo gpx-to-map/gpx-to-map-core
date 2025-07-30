@@ -1,6 +1,7 @@
 package map.filewriter;
 
 import map.gpx.GpxStyler;
+import org.jfree.chart.JFreeChart;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -16,12 +17,15 @@ public interface FileWriter {
      *
      * @param gpxFile        the input GPX file
      * @param outputFolder   the folder where to write the image
+     * @param styler         the {@link GpxStyler} to use
      * @param map            the map to write
      * @param elevationGraph the elevation graph to write
-     * @param styler         the {@link GpxStyler} to use
-     * @throws IOException if there is any issue while writing the {@link BufferedImage} on disk
+     * @param width          width of the image
+     * @param height         height of the image
+     * @param chartHeight    height of the chart
+     * @throws IOException if there is any issue while writing the file on disk
      */
-    void writeMapImageToFile(File gpxFile, Path outputFolder, GpxStyler styler, BufferedImage map, BufferedImage elevationGraph) throws IOException;
+    void writeMapImageToFile(File gpxFile, Path outputFolder, GpxStyler styler, BufferedImage map, JFreeChart elevationGraph, int width, int height, int chartHeight) throws IOException;
 
-    void writeMapImageToFile(File gpxFile, Path outputFolder, GpxStyler styler, BufferedImage map) throws IOException;
+    void writeMapImageToFile(File gpxFile, Path outputFolder, GpxStyler styler, BufferedImage map, int width, int height) throws IOException;
 }

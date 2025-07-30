@@ -64,6 +64,11 @@
             <artifactId>org.jfree.svg</artifactId>
             <version>5.0.7</version>
         </dependency>
+        <dependency>
+            <groupId>org.jfree</groupId>
+            <artifactId>jfreechart</artifactId>
+            <version>1.5.6</version>
+        </dependency>
         <!--TESTS -->
         <dependency>
             <groupId>org.assertj</groupId>
