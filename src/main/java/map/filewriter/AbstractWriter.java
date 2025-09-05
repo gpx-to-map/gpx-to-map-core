@@ -26,6 +26,11 @@ public abstract class AbstractWriter<U> implements FileWriter {
         writeImage(gpxFile, outputFolder, null, map, width, height);
     }
 
+    @Override
+    public void writeMapImageToFile(File gpxFile, Path outputFolder, GpxStyler styler, JFreeChart elevationGraph, int width, int height) throws IOException {
+        writeChart(gpxFile, outputFolder, null, elevationGraph, styler, width, height);
+    }
+
     protected abstract void writeImage(File gpxFile, Path outputFolder, String suffix, U map, int width, int height) throws IOException;
 
     protected abstract void writeImage(File gpxFile, Path outputFolder, String suffix, BufferedImage map, int width, int height) throws IOException;

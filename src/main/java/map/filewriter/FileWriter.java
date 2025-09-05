@@ -28,4 +28,6 @@ public interface FileWriter {
     void writeMapImageToFile(File gpxFile, Path outputFolder, GpxStyler styler, BufferedImage map, JFreeChart elevationGraph, int width, int height, int chartHeight) throws IOException;
 
     void writeMapImageToFile(File gpxFile, Path outputFolder, GpxStyler styler, BufferedImage map, int width, int height) throws IOException;
+
+    void writeMapImageToFile(File gpxFile, Path outputFolder, GpxStyler styler, JFreeChart elevationGraph, int width, int height) throws IOException;
 }

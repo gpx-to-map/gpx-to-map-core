@@ -34,14 +34,14 @@ public class ElevationGraphCreator {
         }
         XYSeriesCollection dataset = new XYSeriesCollection(series);
         JFreeChart chart = ChartFactory.createXYLineChart(
-                null, // pas de titre
-                null, // pas de titre axe X
-                null, // pas de titre axe Y
+                null,
+                null,
+                null,
                 dataset,
                 PlotOrientation.VERTICAL,
-                false, // légende
-                false, // tooltips
-                false  // urls
+                false,
+                false,
+                false
         );
         // Application du style (transparence, couleurs, etc.)
         var plot = chart.getXYPlot();

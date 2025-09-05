@@ -7,8 +7,8 @@ import map.ElevationGraphCreator;
 import map.StaticMapCreator;
 import map.filewriter.FileWriter;
 import map.filewriter.PngWriter;
+import map.filewriter.SvgWriter;
 import org.jfree.chart.JFreeChart;
-import org.knowm.xchart.XYChart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,22 +24,9 @@ import java.util.List;
  * <p>
  * The {@link builder} should be used to create and configure an instance.
  */
-public class DefaultGpxMapper implements IGpxMapper {
+public record DefaultGpxMapper(int width, int height, int chartHeight, GpxStyler styler, FileWriter mapWriter,
+                               FileWriter elevationGraphWriter) implements IGpxMapper {
     public static final Logger LOGGER = LoggerFactory.getLogger(DefaultGpxMapper.class);
-
-    private final int width;
-    private final int height;
-    private final int chartHeight;
-    private final GpxStyler styler;
-    private final FileWriter fileWriter;
-
-    private DefaultGpxMapper(int width, int height, int chartHeight, GpxStyler styler, FileWriter fileWriter) {
-        this.width = width;
-        this.height = height;
-        this.chartHeight = chartHeight;
-        this.styler = styler;
-        this.fileWriter = fileWriter;
-    }
 
     public ExtractedGpxResult map(File gpxFile) throws IOException {
         return map(gpxFile, null);
@@ -52,12 +39,15 @@ public class DefaultGpxMapper implements IGpxMapper {
         LOGGER.info("Parsed {} waypoints", wayPoints.size());
 
         BufferedImage map = StaticMapCreator.createMap(wayPoints, width, height, styler);
+        // Écrire d'abord la carte
+        mapWriter.writeMapImageToFile(gpxFile, outputFolder, styler, map, width, height);
+
+        // Ensuite le graphique d'élévation si nécessaire
         if (styler.displayElevationGraph()) {
             JFreeChart elevationGraph = ElevationGraphCreator.getElevationGraph(wayPoints, styler);
-            this.fileWriter.writeMapImageToFile(gpxFile, outputFolder, styler, map, elevationGraph, width, height, chartHeight);
-        } else {
-            this.fileWriter.writeMapImageToFile(gpxFile, outputFolder, styler, map, width, height);
+            elevationGraphWriter.writeMapImageToFile(gpxFile, outputFolder, styler, elevationGraph, width, chartHeight);
         }
+
         return GpxMetadataExtractor.extract(gpxFile.getName(), tracks, wayPoints);
     }
 
@@ -77,15 +67,9 @@ public class DefaultGpxMapper implements IGpxMapper {
          * Default chart height. Resulting image height will be {@link #height} + chartHeight
          */
         private int chartHeight = 150;
-        /**
-         * The {@link GpxStyler} to use. If none provided, the {@link GpxStyler#getDefaultStyler()} method will be used to create a default one
-         */
         private GpxStyler gpxStyler;
-
-        /**
-         * The {@link FileWriter} to use. Will specify the output format. Defaults to PNG images
-         */
-        private FileWriter fileWriter = new PngWriter();
+        private FileWriter mapWriter = new PngWriter();
+        private FileWriter elevationGraphWriter = new SvgWriter();
 
         public builder withWidth(int width) {
             this.width = width;
@@ -107,8 +91,13 @@ public class DefaultGpxMapper implements IGpxMapper {
             return this;
         }
 
-        public builder setFileWriter(FileWriter fileWriter) {
-            this.fileWriter = fileWriter;
+        public builder withMapWriter(FileWriter mapWriter) {
+            this.mapWriter = mapWriter;
+            return this;
+        }
+
+        public builder withElevationGraphWriter(FileWriter elevationGraphWriter) {
+            this.elevationGraphWriter = elevationGraphWriter;
             return this;
         }
 
@@ -116,7 +105,8 @@ public class DefaultGpxMapper implements IGpxMapper {
             if (this.gpxStyler == null) {
                 this.gpxStyler = GpxStyler.getDefaultStyler();
             }
-            return new DefaultGpxMapper(this.width, this.height, this.chartHeight, this.gpxStyler, this.fileWriter);
+            return new DefaultGpxMapper(this.width, this.height, this.chartHeight,
+                    this.gpxStyler, this.mapWriter, this.elevationGraphWriter);
         }
     }
 }

@@ -42,8 +42,11 @@ public class SvgWriter extends AbstractWriter<SVGGraphics2D> {
 
     @Override
     protected void writeChart(File gpxFile, Path outputFolder, String suffix, JFreeChart elevationGraph, GpxStyler styler, int width, int height) throws IOException {
+        File svgFile = getBaseName(gpxFile, outputFolder, suffix);
         SVGGraphics2D svg2d = new SVGGraphics2D(width, height);
         elevationGraph.draw(svg2d, new Rectangle(0, 0, width, height));
+        SVGUtils.writeToSVG(svgFile, svg2d.getSVGElement());
+        logSuccess(svgFile);
     }
 
     @Override
